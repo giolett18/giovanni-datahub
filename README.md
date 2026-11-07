@@ -3,8 +3,6 @@
 Junior Data Analyst con interesse per Data Science e AI. Studio Scienze e Tecnologie Informatiche (L-31) all'Università Telematica Pegaso e ho completato il percorso Data Science di Start2Impact University.
 Qui raccolgo i progetti con cui ho messo in pratica SQL, Python e la data visualization, a partire da un'automazione che uso ogni mese al lavoro.
 
-📧 giovannilettieri636@gmail.com
-
 ## Progetti
 
 | # | Progetto | Cosa ho fatto | Strumenti |
