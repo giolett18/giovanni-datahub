@@ -1,0 +1,18 @@
+"1. Crea una copia dello sheet ""Raw Data"" e rinominalo ""Operative_TuoNome_TuoCognome"" il file raw servirà nel caso per sbaglio durante l'esercizio si cancellasse qualche dato erroneamente. Mentre le funzioni saranno da applicare al 2° Sheet. Se devi creare delle pivot sviluppale nell'apposito sheet.",,
+,,
+Domande,Risposta,Processo in breve (max 20 parole)
+1. Quanti ID - Utente ci sono (colonna A)?,300,Utilizzo la formula CONTA.VALORE e inserisco l'intervallo delle celle compilate
+2. Quanti ID - Utente unici ci sono (colonna A)?,289,Aggiungo alla formula CONTA.VALORE la formula UNIQUE per avere come output esclusivamente il numero dei valori unici.
+3. Quanti ID - Utente non hanno mai soggiornato a Dublino (Dublin)?,,
+4. Qual è il numero di membri per gruppo familiare più frequente?,,
+5. All'interno dei Paesi vi è un campo scritto in modo errato. Indica in quale riga è presente.,,
+6. Quanti ID - Utente hanno sostenuto una spesa maggiore di 300€?,,
+7. Quale ID - Utente a sostenuto la spesa minore?,,
+8. Quanti ID - Utente hanno il numero più elevato di membri in famiglia? Quanti sono i membri di questi gruppi familiari? ,,
+"9. Quanti ID - Utente hanno più di 30 anni? (Calcolare la data al giorno in cui si effettua il test, non solo anno in corso)",,
+10. Quanti ID - Utente hanno dato una valutazione all'appartamento più alta o uguale a 6?,,
+"11. Qualche ID - Utente ha affittato sia un monopattino, che un'auto?",,
+12. Qual è il mezzo più affittato dagli utenti?,,
+"13. Nelle città valutate a livello ambientale con valore uguale o maggiore di 6, sono maggiormente affittate le auto o i mezzi a basso impatto ambientale? Se i secondi quale di più?",,
+14. Indica la spesa media totale per singolo membro della famiglia,,
+15. Quali città hanno ottenuto un alto punteggio ambientale e un alto valore sull'appartamento in cui hanno alloggiato gli utenti?,,

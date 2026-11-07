@@ -1,0 +1,9 @@
+nome_file,percorso_vecchio,percorso_nuovo
+song1.mp3,.\files\song1.mp3,.\files\audio\song1.mp3
+song2.mp3,.\files\song2.mp3,.\files\audio\song2.mp3
+bw.png,.\files\bw.png,.\files\immagini\bw.png
+daffodil.jpg,.\files\daffodil.jpg,.\files\immagini\daffodil.jpg
+eclipse.png,.\files\eclipse.png,.\files\immagini\eclipse.png
+trump.jpeg,.\files\trump.jpeg,.\files\immagini\trump.jpeg
+ciao.txt,.\files\ciao.txt,.\files\documenti\ciao.txt
+pippo.odt,.\files\pippo.odt,.\files\documenti\pippo.odt
