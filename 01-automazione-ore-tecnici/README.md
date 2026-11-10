@@ -1,6 +1,6 @@
 # Automazione del riepilogo ore dei tecnici
 
-Pipeline Python che trasforma i rapportini giornalieri delle squadre di tecnici in un riepilogo mensile pronto per l'amministrazione: **un PDF per ogni tecnico e un file Excel con i totali**.
+Pipeline Python che trasforma i rapportini giornalieri delle squadre di tecnici in un riepilogo mensile pronto per l'amministrazione: **un PDF per ogni tecnico e un file Excel con i totali**. Con Claude collegato a Google Drive gli stessi dati si interrogano anche in chat, per cantiere o per periodo.
 Sviluppata per l'azienda in cui lavoro e in uso ogni mese: ha sostituito un lavoro manuale di **5–6 giorni** con un processo automatico, riducendo drasticamente il rischio di errore.
 
 > I dati in questa cartella sono **inventati** (Tecnico A, Tecnico B, Impianto FV Alfa…). Nessun nome o dato aziendale reale è pubblicato.
@@ -21,6 +21,7 @@ flowchart LR
     D --> E[PDF per tecnico]
     D --> F[Excel con totali]
     C -. anomalie .-> G[Controlli qualità<br/>nomi mancanti, ore a zero]
+    A -. domande in chat .-> H[Claude + Google Drive<br/>ricerche per cantiere o periodo]
 ```
 
 1. **Raccolta**: i rapportini del mese vengono scaricati dalla cartella Google Drive (un file per squadra).
@@ -41,6 +42,9 @@ flowchart LR
 ### Controlli di qualità
 - `parse.py` stampa una riga `CHECK` per ogni riga con nome mancante o ore lavorate a zero, da verificare.
 - `genera.py` verifica che il numero di pagine PDF coincida con il numero di tecnici e che il riepilogo contenga sia il PDF sia l'Excel.
+
+### Ricerche in linguaggio naturale con Claude
+Oltre ai report mensili, i rapportini su Google Drive si possono interrogare direttamente in chat: con Claude collegato a Drive basta chiedere, per esempio, *"quante ore sono state fatte sull'impianto Alfa a settembre?"* o *"chi ha lavorato in cantiere tra il 10 e il 20 del mese?"*. La risposta arriva in pochi secondi, filtrata per cantiere, tecnico o periodo, senza aprire i file uno per uno.
 
 ## Provalo
 
@@ -69,6 +73,6 @@ Il PDF usa il font Carlito (`fonts-crosextra-carlito` su Linux). Il risultato de
 ```
 
 ## Competenze dimostrate
-Data cleaning su dati reali e disordinati · regole di business tradotte in codice · automazione end-to-end · reportistica (PDF ed Excel) · sviluppo assistito da AI (Claude) · integrazione con Google Drive.
+Data cleaning su dati reali e disordinati · regole di business tradotte in codice · automazione end-to-end · reportistica (PDF ed Excel) · sviluppo assistito da AI (Claude) · interrogazione dei dati in linguaggio naturale · integrazione con Google Drive.
 
 **Strumenti:** Python, openpyxl, reportlab, pypdf, Google Sheets / Drive, Claude.
