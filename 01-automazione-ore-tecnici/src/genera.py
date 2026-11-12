@@ -55,7 +55,15 @@ base = os.path.join(outdir, f'Ore Tecnici {MESI[mese]}')
 HEAD = ['DATA', 'GIORNO SETT.', 'ORE LAVORATE', 'ORE VIAGGIO', 'ORE VIAGGIO IN ORD', 'IMPIANTO']
 
 # PDF
-pdfmetrics.registerFont(TTFont('CalB', '/usr/share/fonts/truetype/crosextra/Carlito-Bold.ttf'))
+# Font: Carlito su Linux, Calibri su Windows; se nessuno dei due c'è, Helvetica (incluso in reportlab)
+FONT_CANDIDATI = ['/usr/share/fonts/truetype/crosextra/Carlito-Bold.ttf',
+                  os.path.join(os.environ.get('WINDIR', r'C:\Windows'), 'Fonts', 'calibrib.ttf'),
+                  '/Library/Fonts/Calibri Bold.ttf']
+FONT = 'Helvetica-Bold'
+for f in FONT_CANDIDATI:
+    if os.path.exists(f):
+        pdfmetrics.registerFont(TTFont('CalB', f)); FONT = 'CalB'
+        break
 W, H = A4
 X = [50.4, 110.1, 195.7, 275.6, 366.9, 458.3, 544.7]
 TOP, BAND_H, HDR_H, ROW_H = H - 53.2, 46.0, 12.2, 12.33
@@ -68,11 +76,11 @@ for nome in nomi:
     y = TOP - BAND_H
     c.setFillColorRGB(*hexcol(C_BAND)); c.setStrokeColorRGB(0.85, 0.85, 0.85); c.setLineWidth(0.4)
     c.rect(X[0], y, X[-1] - X[0], BAND_H, fill=1, stroke=1)
-    c.setFillColorRGB(*hexcol(C_TITLE)); c.setFont('CalB', 16.5)
+    c.setFillColorRGB(*hexcol(C_TITLE)); c.setFont(FONT, 16.5)
     c.drawCentredString((X[0] + X[-1]) / 2, y + BAND_H / 2 - 7, nome.upper())
     y -= HDR_H
     c.setFillColorRGB(0, 0, 0); c.rect(X[0], y, X[-1] - X[0], HDR_H, fill=1, stroke=0)
-    c.setFillColorRGB(1, 1, 1); c.setFont('CalB', 7.2)
+    c.setFillColorRGB(1, 1, 1); c.setFont(FONT, 7.2)
     for i, h in enumerate(HEAD):
         c.drawCentredString((X[i] + X[i + 1]) / 2, y + 3.6, h)
     c.setLineWidth(0.5); c.setStrokeColorRGB(0, 0, 0)
@@ -89,16 +97,16 @@ for nome in nomi:
         c.setFillColorRGB(0, 0, 0)
         for i, v in enumerate(vals):
             size = 7.2 if i < 2 else (6.4 if i < 5 else 5.8)
-            c.setFont('CalB', size)
-            while i == 5 and c.stringWidth(v, 'CalB', size) > X[6] - X[5] - 3 and size > 4:
-                size -= 0.2; c.setFont('CalB', size)
+            c.setFont(FONT, size)
+            while i == 5 and c.stringWidth(v, FONT, size) > X[6] - X[5] - 3 and size > 4:
+                size -= 0.2; c.setFont(FONT, size)
             c.drawCentredString((X[i] + X[i + 1]) / 2, y + 3.6, v)
     c.setStrokeColorRGB(0.85, 0.85, 0.85); c.setLineWidth(0.4)
     y_end = y
     for hgt in (6.5, 18.5):
         y -= hgt
         c.line(X[0], y, X[-1], y)
-    c.setFillColorRGB(0, 0, 0); c.setFont('CalB', 6.4)
+    c.setFillColorRGB(0, 0, 0); c.setFont(FONT, 6.4)
     c.drawCentredString((X[1] + X[2]) / 2, y + 7, 'TOT')
     c.drawCentredString((X[2] + X[3]) / 2, y + 7, num(tot_lav) or '0')
     c.drawCentredString((X[3] + X[4]) / 2, y + 7, num(tot_via) or '0')
@@ -108,9 +116,9 @@ for nome in nomi:
         c.setStrokeColorRGB(0, 0, 0); c.setLineWidth(0.5); c.rect(X[1], y, X[3] - X[1], 11.5, fill=0, stroke=1)
         c.line(X[2], y, X[2], y + 11.5)
         c.setStrokeColorRGB(0.85, 0.85, 0.85); c.setLineWidth(0.4)
-        c.setFillColorRGB(0, 0, 0); c.setFont('CalB', 5.6)
+        c.setFillColorRGB(0, 0, 0); c.setFont(FONT, 5.6)
         c.drawCentredString((X[1] + X[2]) / 2, y + 3.6, 'GIORNI PREPOSTO:')
-        c.setFont('CalB', 6.4); c.drawCentredString((X[2] + X[3]) / 2, y + 3.6, str(prep))
+        c.setFont(FONT, 6.4); c.drawCentredString((X[2] + X[3]) / 2, y + 3.6, str(prep))
         c.line(X[0], y, X[1], y); c.line(X[3], y, X[-1], y)
     for i in range(7):
         if not (prep and 1 <= i <= 3):

@@ -56,7 +56,11 @@ python3 parse.py ../esempio/rapportini rows.json               # estrazione + co
 python3 genera.py rows.json 2026 9 ../output                   # PDF ed Excel
 ```
 
-Il PDF usa il font Carlito (`fonts-crosextra-carlito` su Linux). Il risultato dell'esempio è già in [`esempio/`](esempio/).
+Su **Windows** usa `python` (o `py`) al posto di `python3`. Per scaricare il progetto: pulsante verde **Code → Download ZIP** nella pagina principale del repository, poi apri il terminale nella cartella `01-automazione-ore-tecnici`.
+
+Cosa vedrai: `parse.py` stampa una riga `CHECK` per ogni riga sospetta, `genera.py` stampa i totali di ogni tecnico. Nella cartella `output/` trovi il PDF, l'Excel e una cartella con un PDF per tecnico.
+
+Il PDF usa Carlito su Linux, Calibri su Windows e, se nessuno dei due è installato, Helvetica. Il risultato dell'esempio è già in [`esempio/`](esempio/).
 
 ## Struttura
 
