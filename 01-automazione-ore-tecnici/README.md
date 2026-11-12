@@ -3,7 +3,7 @@
 Pipeline Python che trasforma i rapportini giornalieri delle squadre di tecnici in un riepilogo mensile pronto per l'amministrazione: **un PDF per ogni tecnico e un file Excel con i totali**. Con Claude collegato a Google Drive gli stessi dati si interrogano anche in chat, per cantiere o per periodo.
 Sviluppata per l'azienda in cui lavoro e in uso ogni mese: ha sostituito un lavoro manuale di **5–6 giorni** con un processo automatico, riducendo drasticamente il rischio di errore.
 
-> I dati in questa cartella sono **inventati** (Tecnico A, Tecnico B, Impianto FV Alfa…). Nessun nome o dato aziendale reale è pubblicato.
+> I rapportini di esempio usano **lo stesso modello Google Sheets** compilato dalle squadre, ma i dati sono **inventati** (Tecnico A, Tecnico B, Impianto FV Alfa…). Nessun nome o dato aziendale reale è pubblicato.
 
 ![Anteprima della scheda mensile di un tecnico](anteprima_output.png)
 
@@ -67,7 +67,8 @@ Il PDF usa Carlito su Linux, Calibri su Windows e, se nessuno dei due è install
 ```
 01-automazione-ore-tecnici/
 ├── src/
-│   ├── genera_dati_esempio.py  rapportini fittizi nello stesso formato di quelli reali
+│   ├── genera_dati_esempio.py  rapportini fittizi compilati sul modello reale
+│   ├── modello_rapportino.xlsx il modello Google Sheets usato dalle squadre, senza dati reali
 │   ├── parse.py                estrazione dei dati e controlli
 │   └── genera.py               calcolo, PDF ed Excel
 ├── esempio/
