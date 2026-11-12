@@ -5,6 +5,7 @@ Uso: python3 genera_dati_esempio.py CARTELLA_OUTPUT ANNO MESE
 """
 import calendar, datetime as dt, os, random, sys
 from openpyxl import Workbook
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 out, anno, mese = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 random.seed(42)
@@ -42,6 +43,39 @@ def foglio(ws, giorno, squadra, impianto):
         r += 1
     ws.cell(r + 1, 1, "ATTIVITA' SVOLTE:")
     ws.cell(r + 2, 1, 'Manutenzione ordinaria e verifiche.')
+    stile(ws, r - 1)
+
+LARGHEZZE = {'A': 12, 'B': 16, 'C': 11, 'D': 2, 'E': 2, 'F': 2, 'G': 2,
+             'H': 16, 'I': 12, 'J': 13, 'K': 20}
+BORDO = Border(*(Side(style='thin', color='A6A6A6'),) * 4)
+
+
+def stile(ws, ultima):
+    """Solo aspetto grafico: larghezze, intestazione e formati. I valori non cambiano."""
+    for col, w in LARGHEZZE.items():
+        ws.column_dimensions[col].width = w
+    ws['A1'].font = Font(bold=True, size=14, color='1F4E79')
+    for col in 'ABCHIJK':
+        c = ws[f'{col}3']
+        c.font = Font(bold=True, color='FFFFFF')
+        c.fill = PatternFill('solid', fgColor='1F4E79')
+        c.alignment = Alignment(horizontal='center', vertical='center')
+        c.border = BORDO
+        for r in range(4, ultima + 1):
+            cella = ws[f'{col}{r}']
+            cella.border = BORDO
+            if col != 'B' and col != 'K':
+                cella.alignment = Alignment(horizontal='center')
+    for r in range(4, ultima + 1):
+        ws[f'A{r}'].number_format = 'DD/MM/YYYY'
+        for col in 'HIJ':
+            if col != 'I' or isinstance(ws[f'{col}{r}'].value, dt.time):
+                ws[f'{col}{r}'].number_format = 'hh:mm'
+    ws[f'A{ultima + 2}'].font = Font(bold=True)
+    ws.page_setup.orientation = 'landscape'
+    ws.page_setup.fitToWidth = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+
 
 for nome_squadra, tecnici in SQUADRE.items():
     wb = Workbook(); wb.remove(wb.active)
