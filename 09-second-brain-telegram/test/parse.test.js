@@ -6,7 +6,11 @@ import { analizzaMovimento } from '../src/finance.js';
 
 // Martedì 17 novembre 2026
 const OGGI = '2026-11-17';
-const PROGETTI = ['Inbox', 'Lavoro', 'GTS', 'Enel X', 'Bando REN', 'Studio', 'Reti di calcolatori', 'Famiglia'];
+const D = (nome, progetto, sezione = null) => ({ nome, progetto, sezione });
+const PROGETTI = [
+  D('Lavoro', 'Lavoro'), D('Studio', 'Studio'), D('Personale', 'Personale'),
+  D('GTS', 'Lavoro', 'GTS'), D('Enel X', 'Lavoro', 'Enel X'), D('Reti di calcolatori', 'Studio', 'Reti di calcolatori'),
+];
 
 test('esempio del progetto: report per Rossi entro giovedì, importante', () => {
   const a = analizzaMessaggio('lavoro: report per Rossi entro giovedì, importante', OGGI, PROGETTI);
@@ -18,7 +22,8 @@ test('esempio del progetto: report per Rossi entro giovedì, importante', () => 
 
 test('capo + scadenza domani = P1', () => {
   const a = analizzaMessaggio('gts: inviare offerta domani alle 10 @capo', OGGI, PROGETTI);
-  assert.equal(a.progetto, 'GTS');
+  assert.equal(a.progetto, 'Lavoro');
+  assert.equal(a.sezione, 'GTS');
   assert.equal(a.contenuto, 'Inviare offerta');
   assert.equal(a.data, '2026-11-18');
   assert.equal(a.ora, '10:00');
@@ -35,7 +40,7 @@ test('imprevisto va in sezione Imprevisti ed è urgente', () => {
 
 test('"per" non legato a una data resta nel testo', () => {
   const a = analizzaMessaggio('enel: preparare slide per il cliente', OGGI, PROGETTI);
-  assert.equal(a.progetto, 'Enel X');
+  assert.equal(a.sezione, 'Enel X');
   assert.equal(a.contenuto, 'Preparare slide per il cliente');
   assert.equal(a.data, null);
   assert.equal(a.priorita, 4);
@@ -51,14 +56,15 @@ test('durata breve aggiunge @veloce', () => {
 
 test('nome esame come prefisso e durata in ore', () => {
   const a = analizzaMessaggio('reti di calcolatori: ripassare capitolo 3 domani 1,5 ore', OGGI, PROGETTI);
-  assert.equal(a.progetto, 'Reti di calcolatori');
+  assert.equal(a.progetto, 'Studio');
+  assert.equal(a.sezione, 'Reti di calcolatori');
   assert.equal(a.durata, 90);
   assert.equal(a.data, '2026-11-18');
 });
 
 test('ricorrenze passate a Todoist in italiano', () => {
   const a = analizzaMessaggio('bolletta: pagare luce ogni mese il 10', OGGI, PROGETTI);
-  assert.equal(a.progetto, 'Finanze');
+  assert.equal(a.progetto, 'Personale');
   assert.equal(a.sezione, 'Bollette ricorrenti');
   assert.equal(a.ricorrente, 'ogni mese il 10');
   assert.equal(a.contenuto, 'Pagare luce');

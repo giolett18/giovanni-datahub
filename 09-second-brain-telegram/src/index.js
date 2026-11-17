@@ -2,7 +2,7 @@
 // - fetch: riceve i messaggi da Telegram (webhook)
 // - scheduled: alle 8:00 di Roma invia piano del giorno, avvisi e resoconti
 
-import { ETICHETTE, ORA_PROMEMORIA, SEZIONI_ESAME, STRUTTURA } from './config.js';
+import { ETICHETTE, ORA_PROMEMORIA, STRUTTURA } from './config.js';
 import { aggiungiGiorni, dataLeggibile, oraRoma, romaToUTC } from './dates.js';
 import { analizzaMessaggio, versoApi } from './parse.js';
 import { alberoProgetti, Todoist } from './todoist.js';
@@ -57,7 +57,7 @@ Urgenza: urgente, importante, @capo, @cliente. Durata: 15 min, 2h (sotto i 15 mi
 /entrata 1500 stipendio – registra un'entrata
 /mese – riepilogo del mese (/mese 2026-10 per un altro)
 /settimana – resoconto della settimana
-/esame Reti di calcolatori – crea il progetto di un esame
+/esame Reti di calcolatori – aggiunge un esame in Studio
 /setup – crea la struttura in Todoist`;
 
 export default {
@@ -181,18 +181,29 @@ export async function gestisci(env, chatId, testo) {
 
 async function carica(td) {
   const [tasks, progetti] = await Promise.all([td.attivita(), td.progetti()]);
-  return { tasks, progetti, albero: alberoProgetti(progetti) };
+  const sezioni = (await Promise.all(progetti.map((p) => td.sezioni(p.id)))).flat();
+  return { tasks, progetti, sezioni, albero: alberoProgetti(progetti, sezioni) };
+}
+
+// Ogni progetto e ogni sezione può essere usato come prefisso.
+function destinazioni(progetti, sezioni) {
+  const perId = new Map(progetti.map((p) => [p.id, p]));
+  return [
+    ...progetti.filter((p) => !(p.inbox_project || p.is_inbox_project)).map((p) => ({ nome: p.name, progetto: p.name, sezione: null })),
+    ...sezioni.filter((s) => perId.has(s.project_id)).map((s) => ({ nome: s.name, progetto: perId.get(s.project_id).name, sezione: s.name })),
+  ];
 }
 
 async function aggiungi(env, td, testo, oggi) {
   const progetti = await td.progetti();
-  const a = analizzaMessaggio(testo, oggi, progetti.map((p) => p.name));
+  const sezioni = (await Promise.all(progetti.map((p) => td.sezioni(p.id)))).flat();
+  const a = analizzaMessaggio(testo, oggi, destinazioni(progetti, sezioni));
 
   const progetto = a.progetto ? progetti.find((p) => p.name.toLowerCase() === a.progetto.toLowerCase()) : null;
   const dati = { content: a.contenuto, priority: versoApi(a.priorita) };
   if (progetto) dati.project_id = progetto.id;
   if (progetto && a.sezione) {
-    const sezione = (await td.sezioni(progetto.id)).find((s) => s.name.toLowerCase() === a.sezione.toLowerCase());
+    const sezione = sezioni.find((s) => s.project_id === progetto.id && s.name.toLowerCase() === a.sezione.toLowerCase());
     if (sezione) dati.section_id = sezione.id;
   }
   if (a.etichette.length) dati.labels = a.etichette;
@@ -214,7 +225,7 @@ async function aggiungi(env, td, testo, oggi) {
   else if (a.data) dettagli.push(`📅 ${dataLeggibile(a.data, oggi)}${a.ora ? ' ' + a.ora : ''}`);
   if (a.durata) dettagli.push(`⏱ ${a.durata} min`);
   if (a.etichette.length) dettagli.push(a.etichette.map((e) => '@' + e).join(' '));
-  const dove = progetto ? `${progetto.name}${dati.section_id ? ' › ' + a.sezione : ''}` : 'Inbox';
+  const dove = progetto ? `${progetto.name}${dati.section_id ? ' › ' + sezioni.find((x) => x.id === dati.section_id).name : ''}` : 'Inbox';
   const avviso = a.progetto && !progetto ? `\n⚠️ Non trovo il progetto "${esc(a.progetto)}": l'ho messa in Inbox. Hai già fatto /setup?` : '';
   return `✅ <b>${esc(a.contenuto)}</b>\n${esc(dove)} · ${esc(dettagli.join(' · '))}${avviso}\n/annulla se ho capito male.`;
 }
@@ -267,29 +278,21 @@ async function settimana(env, td, oggi, salvaLista = true) {
 
 export async function setup(td) {
   const creati = [];
-  let progetti = await td.progetti();
-  const trova = (nome, parentId) => progetti.find((p) => p.name === nome && (p.parent_id ?? null) === (parentId ?? null));
-
-  async function assicura(nodo, parentId) {
-    let p = trova(nodo.nome, parentId);
+  const progetti = await td.progetti();
+  for (const nodo of STRUTTURA) {
+    let p = progetti.find((x) => x.name === nodo.nome && !x.parent_id);
     if (!p) {
-      p = await td.creaProgetto(nodo.nome, parentId);
-      progetti.push(p);
+      p = await td.creaProgetto(nodo.nome);
       creati.push(`progetto ${nodo.nome}`);
     }
-    if (nodo.sezioni?.length) {
-      const esistenti = (await td.sezioni(p.id)).map((s) => s.name);
-      for (const s of nodo.sezioni) {
-        if (!esistenti.includes(s)) {
-          await td.creaSezione(s, p.id);
-          creati.push(`sezione ${nodo.nome} › ${s}`);
-        }
+    const esistenti = (await td.sezioni(p.id)).map((s) => s.name);
+    for (const s of nodo.sezioni ?? []) {
+      if (!esistenti.includes(s)) {
+        await td.creaSezione(s, p.id);
+        creati.push(`sezione ${nodo.nome} › ${s}`);
       }
     }
-    for (const figlio of nodo.figli ?? []) await assicura(figlio, p.id);
   }
-
-  for (const nodo of STRUTTURA) await assicura(nodo, null);
 
   const etichette = (await td.etichette()).map((l) => l.name);
   for (const e of ETICHETTE) {
@@ -303,14 +306,13 @@ export async function setup(td) {
   return `✅ Struttura pronta. Ho creato:\n${creati.map((c) => '• ' + esc(c)).join('\n')}\n\nPer ogni esame del semestre scrivi /esame e il nome.`;
 }
 
+// Ogni esame è una sezione del progetto Studio.
 async function creaEsame(td, nome) {
-  const progetti = await td.progetti();
-  const studio = progetti.find((p) => p.name === 'Studio' && !p.parent_id);
+  const studio = (await td.progetti()).find((p) => p.name === 'Studio' && !p.parent_id);
   if (!studio) return 'Prima scrivi /setup per creare il progetto Studio.';
-  if (progetti.some((p) => p.parent_id === studio.id && p.name.toLowerCase() === nome.toLowerCase())) return `L'esame "${esc(nome)}" esiste già.`;
-  const p = await td.creaProgetto(nome, studio.id);
-  for (const s of SEZIONI_ESAME) await td.creaSezione(s, p.id);
-  return `📚 Creato l'esame <b>${esc(nome)}</b> con le sezioni ${SEZIONI_ESAME.join(', ')}.\nPer aggiungere attività: <code>${esc(nome.toLowerCase())}: ripassare capitolo 1 domani</code>`;
+  if ((await td.sezioni(studio.id)).some((s) => s.name.toLowerCase() === nome.toLowerCase())) return `L'esame "${esc(nome)}" esiste già.`;
+  await td.creaSezione(nome, studio.id);
+  return `📚 Aggiunto l'esame <b>${esc(nome)}</b> in Studio.\nPer aggiungere attività: <code>${esc(nome.toLowerCase())}: ripassare capitolo 1 domani</code>`;
 }
 
 // Gira alle 6:00 e alle 7:00 UTC; agisce solo quando a Roma sono le 8 (vale con ora legale e solare).

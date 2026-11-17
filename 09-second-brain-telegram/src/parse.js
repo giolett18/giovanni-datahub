@@ -139,25 +139,27 @@ export function estraiImportanza(testo) {
   return { livello: -1, testo: m[0] };
 }
 
-// Prefisso "progetto: testo". Accetta gli alias e i nomi dei progetti esistenti.
-export function estraiProgetto(testo, nomiProgetti = []) {
+// Prefisso "progetto: testo". Accetta gli alias e i nomi di progetti e sezioni esistenti.
+// destinazioni: [{ nome, progetto, sezione }]
+export function estraiProgetto(testo, destinazioni = []) {
+  const vuoto = { progetto: null, sezione: null, resto: testo, urgente: false };
   const m = testo.match(/^\s*([^:\n]{2,40}?)\s*:\s*(.+)$/s);
-  if (!m) return { progetto: null, sezione: null, resto: testo, urgente: false };
+  if (!m) return vuoto;
   const chiave = m[1].toLowerCase().trim();
   let regola = ALIAS[chiave];
   if (!regola) {
-    // "lavoro gts" o "esame reti" → l'ultima parte che corrisponde a un progetto
-    const nome = nomiProgetti.find((n) => n.toLowerCase() === chiave)
-      ?? nomiProgetti.find((n) => chiave.endsWith(n.toLowerCase()))
-      ?? nomiProgetti.find((n) => n.toLowerCase().includes(chiave) && chiave.length >= 3);
-    if (nome) regola = { progetto: nome };
+    const n = (d) => d.nome.toLowerCase();
+    const dest = destinazioni.find((d) => n(d) === chiave)
+      ?? destinazioni.find((d) => chiave.endsWith(n(d)))
+      ?? (chiave.length >= 3 ? destinazioni.find((d) => n(d).includes(chiave)) : null);
+    if (dest) regola = { progetto: dest.progetto, sezione: dest.sezione };
     else {
+      // "lavoro gts" → usa l'ultima parola se è un alias
       const parole = chiave.split(/\s+/);
-      const ultima = ALIAS[parole[parole.length - 1]];
-      if (ultima) regola = ultima;
+      regola = ALIAS[parole[parole.length - 1]];
     }
   }
-  if (!regola) return { progetto: null, sezione: null, resto: testo, urgente: false };
+  if (!regola) return vuoto;
   return { progetto: regola.progetto, sezione: regola.sezione ?? null, resto: m[2], urgente: !!regola.urgente };
 }
 
@@ -189,8 +191,8 @@ export function priorita(p) {
 export const versoApi = (p) => 5 - p;
 export const daApi = (p) => 5 - p;
 
-export function analizzaMessaggio(testo, oggi, nomiProgetti = []) {
-  const prog = estraiProgetto(testo, nomiProgetti);
+export function analizzaMessaggio(testo, oggi, destinazioni = []) {
+  const prog = estraiProgetto(testo, destinazioni);
   let resto = prog.resto;
 
   const etichette = [...resto.matchAll(/(?:^|\s)@([\p{L}\d_-]+)/gu)].map((m) => m[1].toLowerCase());

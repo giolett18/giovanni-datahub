@@ -16,21 +16,13 @@ Un assistente personale che tiene in ordine lavoro, studio e vita privata. Scriv
 
 ## Struttura in Todoist
 
-Il comando `/setup` crea tutto in un colpo:
+Il piano gratuito di Todoist permette 5 progetti, quindi le aree sono sezioni dentro tre progetti. Il comando `/setup` crea ciò che manca:
 
 ```
-Lavoro            (sezione Imprevisti)
-├── GTS
-├── Enel X
-└── Bando REN
-Studio
-├── Tesi e piano di studi
-└── <un progetto per esame, con /esame>   (sezioni Lezioni, Esercitazioni, Esame)
-Personale
-├── Finanze       (Entrate, Uscite, Bollette ricorrenti)
-├── Scadenze      (Documenti, Assicurazioni, Tasse)
-└── Famiglia
-Etichette: @capo @cliente @veloce
+Lavoro      sezioni: Imprevisti, GTS, Enel X, Bando REN
+Studio      sezioni: Tesi e piano di studi, più una per esame (con /esame)
+Personale   sezioni: Finanze, Bollette ricorrenti, Scadenze, Famiglia
+Etichette:  @capo @cliente @veloce
 ```
 
 Per cambiare aree, ore o prefissi basta modificare [`src/config.js`](src/config.js).
@@ -39,12 +31,12 @@ Per cambiare aree, ore o prefissi basta modificare [`src/config.js`](src/config.
 
 | Messaggio | Risultato |
 |---|---|
-| `gts: inviare offerta domani alle 10 @capo` | GTS · domani 10:00 · P1 |
+| `gts: inviare offerta domani alle 10 @capo` | Lavoro › GTS · domani 10:00 · P1 |
 | `imprevisto: richiamare fornitore oggi` | Lavoro › Imprevisti · oggi · P1 |
-| `enel: preparare slide per il cliente` | Enel X · senza data · P4 |
+| `enel: preparare slide per il cliente` | Lavoro › Enel X · senza data · P4 |
 | `studio: ripassare capitolo 3 domani 1h` | Studio · domani · 60 min |
-| `scadenze: rinnovo assicurazione 20/11` | Scadenze · 20 novembre |
-| `bolletta: pagare luce ogni mese il 10` | Finanze › Bollette ricorrenti · ricorrente |
+| `scadenze: rinnovo assicurazione 20/11` | Personale › Scadenze · 20 novembre |
+| `bolletta: pagare luce ogni mese il 10` | Personale › Bollette ricorrenti · ricorrente |
 | `rispondere a Bianchi 10 min` | Inbox · @veloce |
 
 Date riconosciute: oggi, stasera, domani, dopodomani, giorni della settimana, 25 novembre, 25/11, il 25, tra 3 giorni, fra due settimane, alle 15. Se il bot capisce male, `/annulla` elimina l'ultima attività.
@@ -87,7 +79,7 @@ Poi vai su *Actions › Deploy second brain › Run workflow*. In un paio di min
 
 **5. Primo avvio**
 1. Apri il tuo bot su Telegram e scrivi `/start`. Il bot da quel momento risponde solo a te.
-2. Scrivi `/setup` per creare la struttura in Todoist.
+2. Scrivi `/setup`: controlla la struttura in Todoist e crea ciò che manca.
 3. Per ogni esame del semestre: `/esame Nome dell'esame`.
 
 Da domani alle 8:00 arriva il primo piano del giorno.

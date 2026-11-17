@@ -62,6 +62,8 @@ export function riga(task, n, oggi, albero) {
   }
   const prog = albero?.get(task.project_id);
   if (prog && !prog.inbox && prog.nome !== prog.radice) dettagli.push(prog.nome);
+  const sezione = task.section_id && albero?.sezioni?.get(task.section_id);
+  if (sezione) dettagli.push(sezione);
   if (task.duration?.amount) dettagli.push(`${durataMinuti(task)} min`);
   const etichette = (task.labels ?? []).map((l) => '@' + l);
   if (etichette.length) dettagli.push(etichette.join(' '));

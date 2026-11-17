@@ -79,15 +79,15 @@ function finto() {
 test('setup crea la struttura una volta sola', async () => {
   const { env, db, inviati } = finto();
   await gestisci(env, '1', '/setup');
-  const nomi = db.projects.map((p) => p.name);
-  for (const n of ['Lavoro', 'GTS', 'Enel X', 'Bando REN', 'Studio', 'Tesi e piano di studi', 'Personale', 'Finanze', 'Scadenze', 'Famiglia']) assert.ok(nomi.includes(n), n);
-  const gts = db.projects.find((p) => p.name === 'GTS');
-  assert.equal(gts.parent_id, db.projects.find((p) => p.name === 'Lavoro').id);
+  assert.deepEqual(db.projects.map((p) => p.name), ['Inbox', 'Lavoro', 'Studio', 'Personale']);
+  const sez = (prog) => db.sections.filter((s) => s.project_id === db.projects.find((p) => p.name === prog).id).map((s) => s.name);
+  assert.deepEqual(sez('Lavoro'), ['Imprevisti', 'GTS', 'Enel X', 'Bando REN']);
+  assert.deepEqual(sez('Personale'), ['Finanze', 'Bollette ricorrenti', 'Scadenze', 'Famiglia']);
   assert.deepEqual(db.labels.map((l) => l.name), ['capo', 'cliente', 'veloce']);
   assert.ok(db.sections.some((s) => s.name === 'Imprevisti'));
-  const prima = db.projects.length;
+  const prima = db.projects.length + db.sections.length;
   await gestisci(env, '1', '/setup');
-  assert.equal(db.projects.length, prima);
+  assert.equal(db.projects.length + db.sections.length, prima);
   assert.match(inviati.at(-1), /già completa/);
 });
 
@@ -95,14 +95,15 @@ test('flusso completo: aggiungi, oggi, fatto, spese, promemoria', async () => {
   const { env, db, inviati } = finto();
   await gestisci(env, '1', '/setup');
   await gestisci(env, '1', '/esame Reti di calcolatori');
-  assert.ok(db.sections.some((s) => s.name === 'Esercitazioni'));
+  assert.ok(db.sections.some((s) => s.name === 'Reti di calcolatori' && s.project_id === db.projects.find((p) => p.name === 'Studio').id));
 
   await gestisci(env, '1', 'gts: inviare offerta oggi alle 10 @capo');
   let t = db.tasks.at(-1);
-  assert.equal(t.project_id, db.projects.find((p) => p.name === 'GTS').id);
+  assert.equal(t.project_id, db.projects.find((p) => p.name === 'Lavoro').id);
+  assert.equal(t.section_id, db.sections.find((s) => s.name === 'GTS').id);
   assert.equal(t.priority, 4);
   assert.equal(t.due.datetime, '2026-11-17T09:00:00Z');
-  assert.match(inviati.at(-1), /GTS · P1/);
+  assert.match(inviati.at(-1), /Lavoro › GTS · P1/);
 
   await gestisci(env, '1', 'imprevisto: richiamare Enel X oggi');
   t = db.tasks.at(-1);
@@ -117,7 +118,8 @@ test('flusso completo: aggiungi, oggi, fatto, spese, promemoria', async () => {
   assert.match(piano, /💼 <b>Lavoro<\/b>/);
   assert.match(piano, /📚 <b>Studio<\/b> \(1h su 2h\)/);
   assert.match(piano, /Scadenze in arrivo/);
-  assert.match(piano, /Rinnovo assicurazione auto.*tra 3 giorni/);
+  assert.match(piano, /Rinnovo assicurazione auto.*Scadenze.*tra 3 giorni/);
+  assert.match(piano, /Inviare offerta.*GTS/);
   assert.ok(piano.indexOf('Inviare offerta') < piano.indexOf('Richiamare Enel X'), 'il capo viene prima');
 
   await gestisci(env, '1', '/fatto 1');

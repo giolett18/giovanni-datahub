@@ -7,7 +7,7 @@
   {"command":"mese","description":"Riepilogo entrate e uscite del mese"},
   {"command":"settimana","description":"Resoconto della settimana"},
   {"command":"annulla","description":"Elimina l'ultima attività aggiunta"},
-  {"command":"esame","description":"Crea il progetto di un esame"},
+  {"command":"esame","description":"Aggiunge un esame in Studio"},
   {"command":"setup","description":"Crea la struttura in Todoist"},
   {"command":"aiuto","description":"Come si usa"}
 ]}

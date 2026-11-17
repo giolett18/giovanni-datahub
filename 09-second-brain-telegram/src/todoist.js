@@ -71,7 +71,7 @@ export class Todoist {
 }
 
 // Mappa id progetto → { nome, radice } dove radice è Lavoro / Studio / Personale
-export function alberoProgetti(progetti) {
+export function alberoProgetti(progetti, sezioni = []) {
   const perId = new Map(progetti.map((p) => [p.id, p]));
   const radice = (p) => {
     let cur = p;
@@ -82,5 +82,6 @@ export function alberoProgetti(progetti) {
   for (const p of progetti) {
     mappa.set(p.id, { nome: p.name, radice: radice(p).name, inbox: !!(p.inbox_project || p.is_inbox_project) });
   }
+  mappa.sezioni = new Map(sezioni.map((s) => [s.id, s.name]));
   return mappa;
 }

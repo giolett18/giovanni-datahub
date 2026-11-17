@@ -1,28 +1,13 @@
 // Struttura del second brain in Todoist.
 // /setup crea tutto ciò che manca; non cancella né rinomina nulla.
 
+// Il piano gratuito di Todoist permette 5 progetti: per questo le aree
+// sono sezioni dentro tre progetti principali.
 export const STRUTTURA = [
-  {
-    nome: 'Lavoro',
-    sezioni: ['Imprevisti'],
-    figli: [{ nome: 'GTS' }, { nome: 'Enel X' }, { nome: 'Bando REN' }],
-  },
-  {
-    nome: 'Studio',
-    figli: [{ nome: 'Tesi e piano di studi' }],
-  },
-  {
-    nome: 'Personale',
-    figli: [
-      { nome: 'Finanze', sezioni: ['Entrate', 'Uscite', 'Bollette ricorrenti'] },
-      { nome: 'Scadenze', sezioni: ['Documenti', 'Assicurazioni', 'Tasse'] },
-      { nome: 'Famiglia' },
-    ],
-  },
+  { nome: 'Lavoro', sezioni: ['Imprevisti', 'GTS', 'Enel X', 'Bando REN'] },
+  { nome: 'Studio', sezioni: ['Tesi e piano di studi'] },
+  { nome: 'Personale', sezioni: ['Finanze', 'Bollette ricorrenti', 'Scadenze', 'Famiglia'] },
 ];
-
-// Sezioni create per ogni esame con /esame
-export const SEZIONI_ESAME = ['Lezioni', 'Esercitazioni', 'Esame'];
 
 export const ETICHETTE = ['capo', 'cliente', 'veloce'];
 
@@ -33,28 +18,28 @@ export const BUDGET_MINUTI = { Lavoro: 6 * 60, Studio: 2 * 60 };
 export const DURATA_STANDARD = 30;
 export const DURATA_VELOCE = 15;
 
-// Prefissi rapidi: "gts: ..." finisce nel progetto GTS.
-// Qualsiasi altro nome di progetto funziona comunque come prefisso.
+// Prefissi rapidi: "gts: ..." finisce in Lavoro › GTS.
+// Funziona come prefisso anche il nome di qualsiasi progetto o sezione (es. un esame).
 export const ALIAS = {
   lavoro: { progetto: 'Lavoro' },
   imprevisto: { progetto: 'Lavoro', sezione: 'Imprevisti', urgente: true },
   imprevisti: { progetto: 'Lavoro', sezione: 'Imprevisti', urgente: true },
-  gts: { progetto: 'GTS' },
-  enel: { progetto: 'Enel X' },
-  'enel x': { progetto: 'Enel X' },
-  enelx: { progetto: 'Enel X' },
-  ren: { progetto: 'Bando REN' },
-  bando: { progetto: 'Bando REN' },
-  'bando ren': { progetto: 'Bando REN' },
+  gts: { progetto: 'Lavoro', sezione: 'GTS' },
+  enel: { progetto: 'Lavoro', sezione: 'Enel X' },
+  'enel x': { progetto: 'Lavoro', sezione: 'Enel X' },
+  enelx: { progetto: 'Lavoro', sezione: 'Enel X' },
+  ren: { progetto: 'Lavoro', sezione: 'Bando REN' },
+  bando: { progetto: 'Lavoro', sezione: 'Bando REN' },
+  'bando ren': { progetto: 'Lavoro', sezione: 'Bando REN' },
   studio: { progetto: 'Studio' },
-  tesi: { progetto: 'Tesi e piano di studi' },
+  tesi: { progetto: 'Studio', sezione: 'Tesi e piano di studi' },
   personale: { progetto: 'Personale' },
-  famiglia: { progetto: 'Famiglia' },
-  scadenza: { progetto: 'Scadenze' },
-  scadenze: { progetto: 'Scadenze' },
-  finanze: { progetto: 'Finanze' },
-  bolletta: { progetto: 'Finanze', sezione: 'Bollette ricorrenti' },
-  bollette: { progetto: 'Finanze', sezione: 'Bollette ricorrenti' },
+  famiglia: { progetto: 'Personale', sezione: 'Famiglia' },
+  scadenza: { progetto: 'Personale', sezione: 'Scadenze' },
+  scadenze: { progetto: 'Personale', sezione: 'Scadenze' },
+  finanze: { progetto: 'Personale', sezione: 'Finanze' },
+  bolletta: { progetto: 'Personale', sezione: 'Bollette ricorrenti' },
+  bollette: { progetto: 'Personale', sezione: 'Bollette ricorrenti' },
 };
 
 export const FUSO = 'Europe/Rome';
