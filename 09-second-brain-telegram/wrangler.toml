@@ -1,0 +1,12 @@
+name = "second-brain"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# Alle 6:00 e 7:00 UTC: una delle due corrisponde sempre alle 8:00 di Roma
+[triggers]
+crons = ["0 6 * * *", "0 7 * * *"]
+
+# L'id viene inserito dal workflow di GitHub al momento del deploy
+[[kv_namespaces]]
+binding = "KV"
+id = "KV_ID_PLACEHOLDER"

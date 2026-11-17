@@ -1,0 +1,13 @@
+{"commands":[
+  {"command":"oggi","description":"Piano di oggi"},
+  {"command":"urgenti","description":"Le attività più urgenti"},
+  {"command":"fatto","description":"Completa un'attività (es. /fatto 2)"},
+  {"command":"spesa","description":"Registra un'uscita (es. /spesa 40 benzina)"},
+  {"command":"entrata","description":"Registra un'entrata (es. /entrata 1500 stipendio)"},
+  {"command":"mese","description":"Riepilogo entrate e uscite del mese"},
+  {"command":"settimana","description":"Resoconto della settimana"},
+  {"command":"annulla","description":"Elimina l'ultima attività aggiunta"},
+  {"command":"esame","description":"Crea il progetto di un esame"},
+  {"command":"setup","description":"Crea la struttura in Todoist"},
+  {"command":"aiuto","description":"Come si usa"}
+]}

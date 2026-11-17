@@ -15,6 +15,7 @@ Qui raccolgo i progetti con cui ho messo in pratica SQL, Python e la data visual
 | 06 | [File Organizer](06-file-organizer/) | Script che ordina i file in cartelle per tipo e genera un riepilogo CSV. | Python |
 | 07 | [Excel Advanced](07-excel-advanced/) | Esercitazione di analisi su un dataset di utenti e soggiorni: conteggi, valori univoci, funzioni avanzate. | Excel |
 | 08 | [Dashboard Power BI per un'enoteca](08-powerbi-vini/) | Pulizia di 130.000 recensioni in Python, 8 misure DAX e una dashboard interattiva che indica paesi e varietà con il miglior rapporto qualità/prezzo. | Python, Power BI, DAX, Power Query |
+| 09 | [Second brain: Todoist + bot Telegram](09-second-brain-telegram/) | Bot che trasforma messaggi in linguaggio naturale in attività Todoist con priorità calcolata, manda ogni mattina il piano del giorno su 6 ore di lavoro e 2 di studio, avvisa delle scadenze e tiene il registro di entrate e uscite. | JavaScript, Cloudflare Workers, API Todoist, Telegram, GitHub Actions |
 
 ## Certificazioni Start2Impact University (2025)
 SQL · Python · NumPy · Excel · Excel Advanced · Data Visualization con Tableau · Looker Studio · AI e Prompt Engineering

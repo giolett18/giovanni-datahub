@@ -1,0 +1,77 @@
+name: Deploy second brain
+
+# Pubblica il bot su Cloudflare Workers e lo collega a Telegram.
+# Parte da solo quando cambia il codice su main, oppure a mano da Actions › Run workflow.
+on:
+  push:
+    branches: [main]
+    paths: ['09-second-brain-telegram/**', '.github/workflows/second-brain-deploy.yml']
+  workflow_dispatch:
+
+concurrency: second-brain-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 09-second-brain-telegram
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TODOIST_TOKEN: ${{ secrets.TODOIST_TOKEN }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Controlla i segreti
+        id: segreti
+        run: |
+          mancanti=""
+          for s in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID TODOIST_TOKEN TELEGRAM_TOKEN; do
+            [ -z "${!s}" ] && mancanti="$mancanti $s"
+          done
+          if [ -n "$mancanti" ]; then
+            echo "::warning::Mancano i segreti:$mancanti. Aggiungili in Settings › Secrets and variables › Actions e rilancia il workflow."
+            echo "pronto=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "pronto=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test
+        run: npm test
+
+      - name: Archivio dati (Cloudflare KV)
+        if: steps.segreti.outputs.pronto == 'si'
+        run: |
+          trova() { npx --yes wrangler@4 kv namespace list | jq -r '.[] | select(.title | test("second-brain-dati")) | .id' | head -1; }
+          id=$(trova)
+          if [ -z "$id" ]; then
+            npx --yes wrangler@4 kv namespace create second-brain-dati
+            id=$(trova)
+          fi
+          [ -n "$id" ] || { echo "::error::Non riesco a creare l'archivio KV"; exit 1; }
+          sed -i "s/KV_ID_PLACEHOLDER/$id/" wrangler.toml
+
+      - name: Pubblica su Cloudflare
+        if: steps.segreti.outputs.pronto == 'si'
+        run: |
+          npx --yes wrangler@4 deploy | tee deploy.log
+          echo "$TODOIST_TOKEN" | npx --yes wrangler@4 secret put TODOIST_TOKEN
+          echo "$TELEGRAM_TOKEN" | npx --yes wrangler@4 secret put TELEGRAM_TOKEN
+          url=$(grep -o 'https://[^ ]*workers\.dev' deploy.log | head -1)
+          [ -n "$url" ] || { echo "::error::Indirizzo workers.dev non trovato. Apri Workers & Pages su Cloudflare una volta per scegliere il sottodominio."; exit 1; }
+          echo "URL=$url" >> "$GITHUB_ENV"
+
+      - name: Collega Telegram
+        if: steps.segreti.outputs.pronto == 'si'
+        run: |
+          segreto=$(printf '%s' "$TELEGRAM_TOKEN" | sha256sum | cut -c1-32)
+          curl -fsS "https://api.telegram.org/bot$TELEGRAM_TOKEN/setWebhook" \
+            -d "url=$URL/telegram" -d "secret_token=$segreto" -d 'allowed_updates=["message","edited_message"]'
+          curl -fsS "https://api.telegram.org/bot$TELEGRAM_TOKEN/setMyCommands" -H 'Content-Type: application/json' -d @comandi.json
+          echo "Bot attivo su $URL"
