@@ -1,0 +1,130 @@
+table Vini
+	lineageTag: 5b58ec86-0a24-403f-a760-224b5b964d78
+
+	measure 'Numero vini' = COUNTROWS(Vini)
+		formatString: #,0
+		lineageTag: 348f9573-b15a-4a3a-b0bf-fc88a2a5d080
+
+	measure 'Prezzo medio' = AVERAGE(Vini[Prezzo])
+		formatString: \$#,0.00
+		lineageTag: b664129e-8337-4358-925e-20f6ff9c6f8b
+
+	measure 'Prezzo mediano' = MEDIAN(Vini[Prezzo])
+		formatString: \$#,0
+		lineageTag: ab2bbbca-0caf-4b2a-aacd-5352c1a3706e
+
+	measure 'Punteggio medio' = AVERAGE(Vini[Punteggio])
+		formatString: 0.0
+		lineageTag: 685e74d5-2bb9-4ac4-96c1-e24962ced300
+
+	measure 'Indice qualita prezzo' = AVERAGEX(Vini, DIVIDE(Vini[Punteggio], Vini[Prezzo]))
+		formatString: 0.00
+		lineageTag: 30cdbf04-8294-4150-9773-ec849b52c455
+
+	measure 'Vini affare' = CALCULATE([Numero vini], Vini[Punteggio] >= 90, Vini[Prezzo] <= 20)
+		formatString: #,0
+		lineageTag: 651674f4-7fd3-49dd-979e-8883eb9f02af
+
+	measure '% vini affare' = DIVIDE([Vini affare], [Numero vini])
+		formatString: 0.0%
+		lineageTag: 76642b46-3d27-4507-93f1-38ec9f125c6d
+
+	measure '% vini eccellenti' = DIVIDE(CALCULATE([Numero vini], Vini[Punteggio] >= 90), [Numero vini])
+		formatString: 0.0%
+		lineageTag: bcfc6d89-4e66-467f-8c9e-7fb6763f5b0e
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 2922eb63-260d-4747-9774-0af7bbda59b4
+		summarizeBy: none
+		sourceColumn: ID
+
+	column Vino
+		dataType: string
+		lineageTag: 289df909-2ccc-4cb1-bf22-734342c1b90e
+		summarizeBy: none
+		sourceColumn: Vino
+
+	column Cantina
+		dataType: string
+		lineageTag: fa299355-6b70-44db-b6d6-e98e09a89418
+		summarizeBy: none
+		sourceColumn: Cantina
+
+	column Paese
+		dataType: string
+		lineageTag: a8bffd01-bdfe-4cd2-87b7-3eb851c30d35
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Paese
+
+	column Provincia
+		dataType: string
+		lineageTag: 2ecfe24c-7ac2-494d-a5ba-8f16986d4099
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: Provincia
+
+	column Regione
+		dataType: string
+		lineageTag: d12a9bfc-6fc2-468a-8cc8-84ecdb3c9889
+		summarizeBy: none
+		sourceColumn: Regione
+
+	column Varieta
+		dataType: string
+		lineageTag: 5e3ac9bf-dd63-4aea-bf30-e45ecf0373ac
+		summarizeBy: none
+		sourceColumn: Varieta
+
+	column Annata
+		dataType: int64
+		formatString: 0
+		lineageTag: 33a9bc05-28e0-4bbd-a15b-8e712ddbd8c1
+		summarizeBy: none
+		sourceColumn: Annata
+
+	column Punteggio
+		dataType: int64
+		formatString: 0
+		lineageTag: 99bb46b5-287c-419f-b339-eef5af01cac3
+		summarizeBy: none
+		sourceColumn: Punteggio
+
+	column Prezzo
+		dataType: int64
+		formatString: 0
+		lineageTag: 4898c8c0-1a98-4e86-a902-4b720dc5589d
+		summarizeBy: none
+		sourceColumn: Prezzo
+
+	column 'Fascia prezzo'
+		dataType: string
+		lineageTag: de15d95a-9b38-4c56-82c5-378afa988983
+		summarizeBy: none
+		sourceColumn: Fascia prezzo
+
+	column Giudizio
+		dataType: string
+		lineageTag: 200bef8c-f158-40f8-b903-b7f4e5a85c34
+		summarizeBy: none
+		sourceColumn: Giudizio
+
+	column Degustatore
+		dataType: string
+		lineageTag: 034f2208-570e-4420-b7fe-8cb90e01eed9
+		summarizeBy: none
+		sourceColumn: Degustatore
+
+	partition Vini = m
+		mode: import
+		source =
+				let
+				    Origine = Csv.Document(File.Contents("C:\PowerBI\vini_puliti.csv"), [Delimiter=",", Columns=13, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Intestazioni = Table.PromoteHeaders(Origine, [PromoteAllScalars=true]),
+				    Tipi = Table.TransformColumnTypes(Intestazioni, {{"ID", Int64.Type}, {"Vino", type text}, {"Cantina", type text}, {"Paese", type text}, {"Provincia", type text}, {"Regione", type text}, {"Varieta", type text}, {"Annata", Int64.Type}, {"Punteggio", Int64.Type}, {"Prezzo", Int64.Type}, {"Fascia prezzo", type text}, {"Giudizio", type text}, {"Degustatore", type text}}, "en-US"),
+				    SenzaErrori = Table.ReplaceErrorValues(Tipi, {{"Annata", null}})
+				in
+				    SenzaErrori
+

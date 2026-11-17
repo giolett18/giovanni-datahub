@@ -14,6 +14,7 @@ Qui raccolgo i progetti con cui ho messo in pratica SQL, Python e la data visual
 | 05 | [Dashboard sul settore dell'istruzione](05-looker-studio-istruzione/) | Dashboard interattiva su 92 paesi: studenti per genere, studenti internazionali e ranking delle università. | Looker Studio |
 | 06 | [File Organizer](06-file-organizer/) | Script che ordina i file in cartelle per tipo e genera un riepilogo CSV. | Python |
 | 07 | [Excel Advanced](07-excel-advanced/) | Esercitazione di analisi su un dataset di utenti e soggiorni: conteggi, valori univoci, funzioni avanzate. | Excel |
+| 08 | [Dashboard Power BI per un'enoteca](08-powerbi-vini/) | Pulizia di 130.000 recensioni in Python, 8 misure DAX e una dashboard interattiva che indica paesi e varietà con il miglior rapporto qualità/prezzo. | Python, Power BI, DAX, Power Query |
 
 ## Certificazioni Start2Impact University (2025)
 SQL · Python · NumPy · Excel · Excel Advanced · Data Visualization con Tableau · Looker Studio · AI e Prompt Engineering

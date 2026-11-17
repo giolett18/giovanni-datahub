@@ -1,0 +1,14 @@
+model Model
+	culture: it-IT
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: it-IT
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["Vini"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Vini
+
